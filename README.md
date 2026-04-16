@@ -6,8 +6,11 @@ where cloud access is not permissible.
 ### About
 
 The current chat is very minimal, it uses llama.cpp as the backend and a Qwen/Qwen3-4B-GGUF model under the hood.
+Some missing features that will be added later:
 
-The chat is setup for MacOS and the project will expand to other OS's later.
+1. RAG is not implemented (but there is a very minimal context and chat compression to keep single chat sessions coherent).
+2. There is no document injestion or OCR.
+1. The chat is setup for MacOS and the project will expand to other OS's later.
 
 ### Installation
 We assume you have python3.14 and cmake (4.2.0) installed on your system.
@@ -28,7 +31,7 @@ open index.html
 
 ### Example Session
 
-<video src="./assets/example_vid.mp4" controls width="600"></video>
+![example session](./assets/example_vid.mp4)
 
 ### Linux
 Coming soon. 
