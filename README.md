@@ -31,7 +31,7 @@ open index.html
 
 ### Example Session
 
-<video src="https://github.com/AquiLLM/AquiLLM-Pico/blob/main/assets/example_vid.mp4" controls></video>
+![example session](./assets/example_vid.gif)
 
 ### Linux
 Coming soon. 
