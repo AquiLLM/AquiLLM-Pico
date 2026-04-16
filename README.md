@@ -26,6 +26,10 @@ bash run_server.sh
 open index.html
 ```
 
+### Example Session
+
+<video src="./assets/example_vid.mp4" controls width="600"></video>
+
 ### Linux
 Coming soon. 
 
