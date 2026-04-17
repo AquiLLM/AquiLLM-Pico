@@ -1,7 +1,12 @@
 git clone https://github.com/ggml-org/llama.cpp
 cd llama.cpp
 git checkout b8580
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=ON
+
+cmake -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DGGML_METAL=ON \
+  -DCMAKE_C_COMPILER=/usr/bin/clang \
+  -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 cmake --build build --config Release -j$(sysctl -n hw.logicalcpu)
 
 python3.14 -m venv aquillm
