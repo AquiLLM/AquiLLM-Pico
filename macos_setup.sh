@@ -9,7 +9,7 @@ cmake -B build \
   -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 cmake --build build --config Release -j$(sysctl -n hw.logicalcpu)
 
-python3.14 -m venv aquillm
+python -m venv aquillm
 source aquillm/bin/activate
 
 pip install huggingface_hub
