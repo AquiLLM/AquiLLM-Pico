@@ -13,4 +13,4 @@ python -m venv aquillm
 source aquillm/bin/activate
 
 pip install huggingface_hub
-python3 -c "from huggingface_hub import hf_hub_download; hf_hub_download('Qwen/Qwen3-4B-GGUF', filename='Qwen3-4B-Q4_K_M.gguf', local_dir='./models')"
+python -c "from huggingface_hub import hf_hub_download; hf_hub_download('Qwen/Qwen3-4B-GGUF', filename='Qwen3-4B-Q4_K_M.gguf', local_dir='./models')"
