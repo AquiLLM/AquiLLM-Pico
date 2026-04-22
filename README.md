@@ -22,17 +22,28 @@ Run the following to fetch llama.cpp repo and compile with the metal shaders, it
 bash macos_setup.sh
 ```
 
-### Running Session
+### Linux
+
+```
+bash linux_ubuntu_setup.sh
+```
+
+### Web Browser Session
 ```
 bash run_server.sh
 
 open index.html
 ```
 
+### Command Line Interface
+
+```
+bash run_cli.sh
+```
+
 ### Example Session
 
 ![example session](./assets/example_vid.gif)
 
-### Linux
-Coming soon. 
+
 
