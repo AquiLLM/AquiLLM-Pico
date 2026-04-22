@@ -5,7 +5,6 @@ git clone https://github.com/ggml-org/llama.cpp
 cd llama.cpp
 git checkout b8580
 
-# CPU-only build (works everywhere)
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DGGML_VULKAN=ON
 cmake --build build --config Release -j$(nproc)
 
