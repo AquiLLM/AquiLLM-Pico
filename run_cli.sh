@@ -13,7 +13,6 @@ cat <<'EOF'
  /_/    \_\__, |\__,_|_|______|______|_|  |_|          |_|   |_|\___\___/ 
              | |                                                          
              |_|                                                          
-
 To exit:                 /exit  
 To regenerate prompt:    /regen  
 To clear chat history:   /clear  
@@ -21,15 +20,46 @@ To read a text file:     /read
 To pattern match a file: /glob
 EOF
 
-script -q /dev/null ./llama.cpp/build/bin/llama-cli \
-  -m ./llama.cpp/models/Qwen3-4B-Q4_K_M.gguf \
-  -ngl 99 -c 4096 -cnv \
-  --reasoning-budget 0 --log-disable --verbosity 0 \
-  --no-display-prompt \
-| python3 -u -c '
+# llama-cli invocation args (shared between platforms)
+LLAMA_BIN="./llama.cpp/build/bin/llama-cli"
+LLAMA_ARGS=(
+    -m ./llama.cpp/models/Qwen3-4B-Q4_K_M.gguf
+    -ngl 99
+    -c 4096
+    -cnv
+    --reasoning-budget 0
+    --log-disable
+    --verbosity 0
+    --no-display-prompt
+)
+
+# run the command through a PTY, using the right `script` syntax for the OS
+run_with_pty() {
+    case "$(uname -s)" in
+        Darwin)
+            # macOS (BSD script): script -q <logfile> <command> [args...]
+            script -q /dev/null "$LLAMA_BIN" "${LLAMA_ARGS[@]}"
+            ;;
+        Linux)
+            # Linux (util-linux script): script -qfc "<command string>" <logfile>
+            # -f flushes after every write (needed for streaming output)
+            local cmd="$LLAMA_BIN"
+            for arg in "${LLAMA_ARGS[@]}"; do
+                cmd+=" $(printf '%q' "$arg")"
+            done
+            script -qfc "$cmd" /dev/null
+            ;;
+        *)
+            echo "Unsupported OS: $(uname -s)" >&2
+            echo "Falling back to direct invocation (no PTY)." >&2
+            "$LLAMA_BIN" "${LLAMA_ARGS[@]}"
+            ;;
+    esac
+}
+
+run_with_pty | python3 -u -c '
 import sys, threading, time, codecs
 
-# ---- spinner shown while the banner has not yet appeared ----
 stop_spinner = threading.Event()
 def spin():
     frames = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
@@ -43,16 +73,13 @@ def spin():
         sys.stdout.write("\b")
         sys.stdout.flush()
         i += 1
-    # clear the "Loading model... " line
     sys.stdout.write("\r\033[K")
     sys.stdout.flush()
 
 spinner_thread = threading.Thread(target=spin, daemon=True)
 spinner_thread.start()
 
-# ---- streaming UTF-8 decoder: buffers partial multi-byte sequences ----
 decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
-
 in_banner = False
 started = False
 line_buf = ""
@@ -61,16 +88,14 @@ while True:
     chunk = sys.stdin.buffer.read(1)
     if not chunk:
         break
-    text = decoder.decode(chunk)   # may return "" until a full codepoint is ready
+    text = decoder.decode(chunk)
     if not text:
         continue
-
     for ch in text:
         if started:
             sys.stdout.write(ch)
             sys.stdout.flush()
             continue
-
         line_buf += ch
         if ch == "\n":
             line = line_buf.rstrip("\r\n")
