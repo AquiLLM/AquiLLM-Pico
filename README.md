@@ -16,16 +16,31 @@ Some missing features that will be added later:
 We assume you have python3.14 and cmake (4.2.0) installed on your system.
 
 ### MacOS
-Run the following to fetch llama.cpp repo and compile with the metal shaders, it then fetches Qwen3-4B-GGUF and installs it on your system. Be sure to have at least 3GB of space available for this.
+Run the following to fetch llama.cpp repo and compile with the metal shaders. It then fetches Qwen3-4B-GGUF and installs it on your system. Be sure to have at least 3GB of space available for this.
 
 ```
 bash macos_setup.sh
 ```
 
 ### Linux
+Run the following to fetch llama.cpp repo and compile to appropriate GPU for your system (CUDA, AMD-(ROCm), VULKAN). It then fetches Qwen3-4B-GGUF and installs it on your system. Be sure to have at least 3GB of space available for this.
+
+`CUDA:`
 
 ```
-bash linux_ubuntu_setup.sh
+bash linux_ubuntu_cuda_setup.sh
+```
+
+`AMD:`
+
+```
+bash linux_ubuntu_amd_setup.sh
+```
+
+`VULKAN`
+
+```
+bash linux_ubuntu_vulkan_setup.sh
 ```
 
 ### Web Browser Session
