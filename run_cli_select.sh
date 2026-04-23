@@ -107,14 +107,51 @@ done
 echo ""
 
 # ── Launch llama-cli ─────────────────────────────────────────────────────────
-script -q /dev/null ./llama.cpp/build/bin/llama-cli \
-  -m "$SELECTED_MODEL_FILE" \
-  -ngl 99 -c 4096 -cnv \
-  $REASONING_FLAG \
-  --reasoning-budget "$REASONING_BUDGET" \
-  --log-disable --verbosity 0 \
-  --no-display-prompt \
-| python3 -u -c '
+#script -q /dev/null ./llama.cpp/build/bin/llama-cli \
+#  -m "$SELECTED_MODEL_FILE" \
+#  -ngl 99 -c 4096 -cnv \
+#  $REASONING_FLAG \
+#  --reasoning-budget "$REASONING_BUDGET" \
+#  --log-disable --verbosity 0 \
+#  --no-display-prompt \
+#| python3 -u -c '
+
+LLAMA_BIN="./llama.cpp/build/bin/llama-cli"
+LLAMA_ARGS=(
+    -m "$SELECTED_MODEL_FILE"
+    -ngl 99
+    -c 4096
+    -cnv
+    $REASONING_FLAG
+    --reasoning-budget "$REASONING_BUDGET"
+    --log-disable
+    --verbosity 0
+    --no-display-prompt
+)
+
+run_with_pty() {
+    case "$(uname -s)" in
+        Darwin)
+            # macOS BSD script: script -q <logfile> <command> [args...]
+            script -q /dev/null "$LLAMA_BIN" "${LLAMA_ARGS[@]}"
+            ;;
+        Linux)
+            # util-linux script: script -qfc "<command string>" <logfile>
+            # -f flushes after every write (essential for streaming output)
+            local cmd="$LLAMA_BIN"
+            for arg in "${LLAMA_ARGS[@]}"; do
+                cmd+=" $(printf '%q' "$arg")"
+            done
+            script -qfc "$cmd" /dev/null
+            ;;
+        *)
+            echo "Unsupported OS: $(uname -s); running without PTY." >&2
+            "$LLAMA_BIN" "${LLAMA_ARGS[@]}"
+            ;;
+    esac
+}
+
+run_with_pty | python3 -u -c '
 import sys, threading, time, codecs, re, select, shutil, os
 
 # ── Terminal width ────────────────────────────────────────────────────────────
